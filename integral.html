@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RealShift · Formulario Integral</title>
+<style>
+  :root {
+    --bg: #1a1a1a;
+    --surface: #222222;
+    --panel: #2a2a2a;
+    --border: #3a3a3a;
+    --border-hover: #555555;
+    --accent: #e63946;
+    --accent-dim: #9a2a32;
+    --accent-glow: #e6394630;
+    --green: #2dc653;
+    --text: #f0f0f0;
+    --muted: #999999;
+    --subtle: #555555;
+    --yellow-cell: #252010;
+    --yellow-border: #6a5010;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--accent-dim);
+    padding: 0 32px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner {
+    max-width: 760px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 52px;
+  }
+  .logo-mark {
+    width: 28px; height: 28px; background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 14px; color: #fff; flex-shrink: 0;
+  }
+  .logo-text { font-weight: 900; font-size: 13px; letter-spacing: 0.14em; color: var(--text); }
+  .logo-sub { font-size: 9px; letter-spacing: 0.1em; color: var(--muted); margin-left: 8px; }
+  .logo-wrap { display: flex; align-items: center; gap: 10px; }
+  .header-tag {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--accent-dim); padding: 3px 10px; border-radius: 2px;
+  }
+
+  /* PROGRESS */
+  .progress-bar-wrap {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 10px 32px; position: sticky; top: 52px; z-index: 99;
+  }
+  .progress-bar-inner { max-width: 760px; margin: 0 auto; }
+  .progress-steps { display: flex; gap: 4px; }
+  .prog-step { flex: 1; height: 3px; border-radius: 1px; background: var(--border); transition: background 0.3s; }
+  .prog-step.active { background: var(--accent); }
+  .prog-step.done { background: var(--green); }
+  .prog-label { font-size: 9px; letter-spacing: 0.1em; color: var(--muted); margin-top: 6px; text-transform: uppercase; }
+
+  /* MAIN */
+  .main { max-width: 760px; margin: 0 auto; padding: 32px 32px 80px; }
+
+  /* SECTION DIVIDER */
+  .sec-div {
+    display: flex; align-items: center; gap: 12px;
+    margin: 2rem 0 1.5rem;
+  }
+  .sec-div-line { flex: 1; height: 1px; background: var(--border); }
+  .sec-div-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent); padding: 4px 12px;
+    border: 1px solid var(--accent-dim); border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  /* BLOCK */
+  .block { margin-bottom: 36px; animation: fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  .block-head {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px; padding-bottom: 9px; border-bottom: 1px solid var(--border);
+  }
+  .block-num {
+    background: var(--accent); color: #fff;
+    font-size: 9px; font-weight: 900; width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .block-title { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+  .block-tag { margin-left: auto; font-size: 9px; letter-spacing: 0.08em; color: var(--muted); }
+
+  /* GRID */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .mb { margin-bottom: 12px; }
+
+  /* FIELD */
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .field label .req { color: var(--accent); margin-left: 2px; }
+  .field input, .field select, .field textarea {
+    background: var(--yellow-cell);
+    border: 1px solid var(--yellow-border);
+    color: var(--text);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px; padding: 9px 12px; border-radius: 2px;
+    outline: none; transition: border-color 0.15s, background 0.15s; width: 100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); background: #2a1f08; }
+  .field input::placeholder, .field textarea::placeholder { color: #7a6a40; }
+  .field select { appearance: none; cursor: pointer; }
+  .field select option { background: #252010; }
+  .field textarea { resize: vertical; min-height: 64px; line-height: 1.5; }
+  .hint { font-size: 9px; color: var(--muted); letter-spacing: 0.05em; line-height: 1.4; margin-top: 3px; }
+
+  /* CHECKS */
+  .checks {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 6px; margin-bottom: 10px;
+  }
+  .chk {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 8px 10px; border-radius: 2px;
+    font-size: 11px; color: var(--text);
+    cursor: pointer; transition: border-color 0.15s, background 0.15s; user-select: none;
+  }
+  .chk:hover { border-color: var(--border-hover); }
+  .chk input { accent-color: var(--accent); width: 13px; height: 13px; flex-shrink: 0; }
+  .chk:has(input:checked) { border-color: var(--accent-dim); background: var(--accent-glow); }
+
+  /* PILLS */
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .pill {
+    display: flex; align-items: center; gap: 6px;
+    border: 1px solid var(--border); border-radius: 2px;
+    padding: 6px 12px; font-size: 11px; color: var(--muted);
+    cursor: pointer; background: var(--panel);
+    transition: all 0.15s; user-select: none;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  .pill input { accent-color: var(--accent); width: 12px; height: 12px; }
+  .pill:has(input:checked) { border-color: var(--accent-dim); background: var(--accent-glow); color: var(--text); }
+
+  /* ALERT */
+  .alert {
+    background: #2a1015; border: 1px solid var(--accent-dim); border-left: 3px solid var(--accent);
+    padding: 10px 14px; font-size: 11px; color: #e08080;
+    letter-spacing: 0.04em; margin-bottom: 14px;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+
+  /* SELECT ARROW */
+  .sw { position: relative; }
+  .sw::after {
+    content: '▾'; position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%); color: var(--muted); font-size: 11px; pointer-events: none;
+  }
+  .sw select { padding-right: 28px; }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: linear-gradient(to right, var(--accent-dim), var(--border), transparent); margin: 24px 0; }
+
+  /* SUBMIT */
+  .submit-area {
+    background: var(--surface); border: 1px solid var(--border);
+    border-top: 2px solid var(--accent); padding: 24px; margin-top: 40px; text-align: center;
+  }
+  .submit-note { font-size: 10px; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 16px; text-transform: uppercase; }
+  .btn-submit {
+    background: var(--accent); color: #fff; border: none;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 14px 40px; cursor: pointer; transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn-submit:hover { opacity: 0.88; }
+  .btn-submit:active { transform: scale(0.98); }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .privacy-note { font-size: 9px; color: var(--subtle); letter-spacing: 0.06em; margin-top: 12px; text-transform: uppercase; }
+
+  /* TOAST */
+  .toast {
+    display: none; position: fixed; bottom: 24px; right: 24px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 12px 20px; z-index: 999;
+  }
+  .toast.ok { background: var(--green); color: #000; }
+  .toast.err { background: var(--accent); color: #fff; }
+
+  @media (max-width: 600px) {
+    .main { padding: 20px 16px 60px; }
+    .g2, .g3 { grid-template-columns: 1fr; }
+    .header, .progress-bar-wrap { padding-left: 16px; padding-right: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <div class="logo-mark">R</div>
+      <div>
+        <span class="logo-text">REALSHIFT</span>
+        <span class="logo-sub">ASESORÍA INTEGRAL</span>
+      </div>
+    </div>
+    <div class="header-tag">Entrenamiento + Nutrición</div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar-wrap">
+  <div class="progress-bar-inner">
+    <div class="progress-steps" id="progressSteps"></div>
+    <div class="prog-label" id="progressLabel">Bloque 1 de 10 — Datos personales</div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="main">
+<form id="rsForm" action="https://formspree.io/f/mwvzpavk" method="POST">
+
+  <input type="hidden" name="_subject" value="Nuevo cliente RealShift — Asesoría Integral (Entrenamiento + Nutrición)">
+
+  <!-- ── BLOQUE 01: DATOS PERSONALES ── -->
+  <div class="block" id="b1">
+    <div class="block-head">
+      <div class="block-num">01</div>
+      <div class="block-title">Datos personales</div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Nombre completo <span class="req">*</span></label>
+        <input type="text" name="nombre_completo" placeholder="Nombre y apellidos" id="f_nombre" required>
+      </div>
+      <div class="field">
+        <label>Fecha de nacimiento <span class="req">*</span></label>
+        <input type="date" name="fecha_nacimiento" required>
+      </div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="correo@ejemplo.com">
+      </div>
+      <div class="field">
+        <label>Teléfono</label>
+        <input type="tel" name="telefono" placeholder="+34 600 000 000">
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Profesión / tipo de jornada</label>
+        <input type="text" name="profesion" placeholder="Hostelería, oficina, turnos rotativos...">
+      </div>
+      <div class="field">
+        <label>Lugar de residencia</label>
+        <input type="text" name="residencia" placeholder="Ciudad o zona">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── BLOQUE 02: ANTROPOMETRÍA ── -->
+  <div class="block" id="b2">
+    <div class="block-head">
+      <div class="block-num">02</div>
+      <div class="block-title">Antropometría</div>
+      <div class="block-tag">Datos corporales actuales</div>
+    </div>
+    <div class="g3 mb">
+      <div class="field">
+        <label>Altura (cm) <span class="req">*</span></label>
+        <input type="number" name="altura_cm" placeholder="175" required>
+      </div>
+      <div class="field">
+        <label>Peso actual (kg) <span class="req">*</span></label>
+        <input type="number" name="peso_actual_kg" placeholder="80.5" step="0.1" required>
+      </div>
+      <div class="field">
+        <label>Peso objetivo (kg)</label>
+        <input type="number" name="peso_objetivo_kg" placeholder="75" step="0.1">
+      </div>
+    </div>
+    <div class="g3">
+      <div class="field">
+        <label>% Graso estimado</label>
+        <input type="number" name="porcentaje_graso" placeholder="22" step="0.1">
+        <span class="hint">Bioimpedancia, DEXA o estimación visual</span>
+      </div>
+      <div class="field">
+        <label>Perímetro cintura (cm)</label>
+        <input type="number" name="perimetro_cintura_cm" placeholder="88">
+      </div>
+      <div class="field">
+        <label>Perímetro cadera (cm)</label>
+        <input type="number" name="perimetro_cadera_cm" placeholder="95">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── BLOQUE 03: ESTADO DE SALUD ── -->
+  <div class="block" id="b3">
+    <div class="block-head">
+      <div class="block-num">03</div>
+      <div class="block-title">Estado de salud</div>
+    </div>
+    <div class="alert">
+      <span style="color:var(--accent);font-size:14px;flex-shrink:0">▲</span>
+      <span>Sección crítica. Responde con la máxima precisión — condiciona directamente el diseño del plan.</span>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Patologías diagnosticadas</label>
+        <textarea name="patologias" placeholder="Diabetes, hipotiroidismo, SOP, hipertensión... Indica 'ninguna' si no aplica."></textarea>
+      </div>
+      <div class="field">
+        <label>Medicación actual</label>
+        <textarea name="medicacion" placeholder="Nombre y dosis. Indica 'ninguna' si no tomas."></textarea>
+      </div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Lesiones o limitaciones físicas</label>
+        <textarea name="lesiones" placeholder="Rodilla, lumbar, hombro, cadera... Indica si es crónico o en recuperación."></textarea>
+      </div>
+      <div class="field">
+        <label>Antecedentes familiares relevantes</label>
+        <textarea name="antecedentes_familiares" placeholder="Cardiopatías, diabetes, dislipemias, enfermedades metabólicas..."></textarea>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Analítica reciente disponible</label>
+        <div class="pills">
+          <label class="pill"><input type="radio" name="analitica" value="Si, reciente"> Sí, reciente</label>
+          <label class="pill"><input type="radio" name="analitica" value="Si, antigua +6m"> Sí, antigua (+6m)</label>
+          <label class="pill"><input type="radio" name="analitica" value="No tengo"> No tengo</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Valores clave si disponibles</label>
+        <input type="text" name="valores_analitica" placeholder="Glucosa, TSH, colesterol, ferritina...">
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SEPARADOR ENTRENAMIENTO ════ -->
+  <div class="sec-div">
+    <div class="sec-div-line"></div>
+    <div class="sec-div-label">Entrenamiento</div>
+    <div class="sec-div-line"></div>
+  </div>
+
+  <!-- ── BLOQUE 04: HISTORIAL DE ENTRENAMIENTO ── -->
+  <div class="block" id="b4">
+    <div class="block-head">
+      <div class="block-num">04</div>
+      <div class="block-title">Historial de entrenamiento</div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Experiencia de entrenamiento <span class="req">*</span></label>
+        <div class="sw"><select name="experiencia_entrenamiento" required>
+          <option value="">— Seleccionar —</option>
+          <option>Sin experiencia previa</option>
+          <option>Principiante (menos de 1 año)</option>
+          <option>Intermedio (1–3 años)</option>
+          <option>Avanzado (+3 años)</option>
+          <option>Atleta / deportista federado</option>
+        </select></div>
+      </div>
+      <div class="field">
+        <label>Modalidad practicada actualmente</label>
+        <div class="sw"><select name="modalidad_actual">
+          <option value="">— Seleccionar —</option>
+          <option>Sala de musculación (libre)</option>
+          <option>Máquinas / gimnasio comercial</option>
+          <option>CrossFit / funcional</option>
+          <option>Deporte de equipo (fútbol, pádel...)</option>
+          <option>Cardio / running</option>
+          <option>Sin actividad actual</option>
+          <option>Otro</option>
+        </select></div>
+      </div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Días disponibles para entrenar / semana <span class="req">*</span></label>
+        <div class="sw"><select name="dias_entrenamiento" required>
+          <option value="">— Seleccionar —</option>
+          <option>2 días</option>
+          <option>3 días</option>
+          <option>4 días</option>
+          <option>5 días</option>
+          <option>+5 días</option>
+        </select></div>
+      </div>
+      <div class="field">
+        <label>Duración máxima por sesión</label>
+        <div class="sw"><select name="duracion_sesion">
+          <option value="">— Seleccionar —</option>
+          <option>45 min</option>
+          <option>60 min</option>
+          <option>75–90 min</option>
+          <option>Sin restricción</option>
+        </select></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Acceso a instalaciones</label>
+        <div class="checks" style="margin-top:6px">
+          <label class="chk"><input type="checkbox" name="acceso_gym_completo" value="Sí"> Gimnasio completo</label>
+          <label class="chk"><input type="checkbox" name="acceso_maquinas" value="Sí"> Solo máquinas</label>
+          <label class="chk"><input type="checkbox" name="acceso_casa" value="Sí"> Material en casa</label>
+          <label class="chk"><input type="checkbox" name="acceso_corporal" value="Sí"> Peso corporal únicamente</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Horario habitual de entrenamiento</label>
+        <input type="text" name="horario_entrenamiento" placeholder="Ej: mañanas 7–9h, o tarde 19–21h">
+        <span class="hint">Condiciona la periodización y la nutrición periworkout</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── BLOQUE 05: RENDIMIENTO Y OBJETIVOS ── -->
+  <div class="block" id="b5">
+    <div class="block-head">
+      <div class="block-num">05</div>
+      <div class="block-title">Rendimiento y objetivos de entrenamiento</div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Objetivo principal de entrenamiento <span class="req">*</span></label>
+        <div class="sw"><select name="objetivo_entrenamiento" required>
+          <option value="">— Seleccionar —</option>
+          <option>Ganancia de fuerza máxima</option>
+          <option>Hipertrofia muscular</option>
+          <option>Pérdida de grasa + tonificación</option>
+          <option>Rendimiento deportivo específico</option>
+          <option>Mejora de movilidad y salud articular</option>
+          <option>Recomposición corporal</option>
+        </select></div>
+      </div>
+      <div class="field">
+        <label>¿Tienes deporte o actividad fuera del gym?</label>
+        <input type="text" name="deporte_externo" placeholder="Fútbol, pádel, ciclismo, artes marciales...">
+        <span class="hint">Si sí, indica frecuencia y nivel (amateur / federado)</span>
+      </div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Marcas o registros actuales relevantes</label>
+        <textarea name="marcas_actuales" placeholder="Sentadilla, peso muerto, press banca, dominadas... Indica carga x reps o RM estimado."></textarea>
+      </div>
+      <div class="field">
+        <label>Grupos musculares o patrones a priorizar</label>
+        <textarea name="prioridades_musculares" placeholder="Ej: glúteo retrasado, poco trabajo de movilidad de cadera, falta de fuerza en tren superior..."></textarea>
+      </div>
+    </div>
+    <div class="field">
+      <label>Ejercicios que no puedes o no quieres realizar</label>
+      <textarea name="ejercicios_excluidos" placeholder="Por lesión, molestia, incomodidad técnica o preferencia personal. Cuanto más específico, mejor."></textarea>
+    </div>
+  </div>
+
+  <!-- ════ SEPARADOR NUTRICIÓN ════ -->
+  <div class="sec-div">
+    <div class="sec-div-line"></div>
+    <div class="sec-div-label">Nutrición</div>
+    <div class="sec-div-line"></div>
+  </div>
+
+  <!-- ── BLOQUE 06: HÁBITOS NUTRICIONALES ── -->
+  <div class="block" id="b6">
+    <div class="block-head">
+      <div class="block-num">06</div>
+      <div class="block-title">Hábitos nutricionales actuales</div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Número de ingestas diarias</label>
+        <div class="sw"><select name="num_ingestas">
+          <option value="">— Seleccionar —</option>
+          <option>1 ingesta</option>
+          <option>2 ingestas</option>
+          <option>3 ingestas</option>
+          <option>4 ingestas</option>
+          <option>+5 ingestas</option>
+          <option>Variable / sin horario fijo</option>
+        </select></div>
+      </div>
+      <div class="field">
+        <label>Horario de comidas habitual</label>
+        <input type="text" name="horario_comidas" placeholder="Ej: desayuno 8h, comida 14h, cena 21h">
+      </div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>¿Practica ayuno intermitente?</label>
+        <div class="pills">
+          <label class="pill"><input type="radio" name="ayuno" value="No"> No</label>
+          <label class="pill"><input type="radio" name="ayuno" value="Sí, actualmente"> Sí, actualmente</label>
+          <label class="pill"><input type="radio" name="ayuno" value="A veces"> A veces</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Protocolo de ayuno (si aplica)</label>
+        <input type="text" name="protocolo_ayuno" placeholder="Ej: 16:8 — primera ingesta a las 13h">
+      </div>
+    </div>
+    <div class="field">
+      <label>Descripción de un día de alimentación típico</label>
+      <textarea name="dia_tipico" style="min-height:75px" placeholder="Desayuno, comida, cena y snacks habituales. Cuanto más detallado, mejor."></textarea>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── BLOQUE 07: ALERGIAS E INTOLERANCIAS ── -->
+  <div class="block" id="b7">
+    <div class="block-head">
+      <div class="block-num">07</div>
+      <div class="block-title">Alergias e intolerancias</div>
+      <div class="block-tag" style="color:var(--accent)">Declaración obligatoria</div>
+    </div>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" name="alergia_gluten" value="Sí"> Gluten / trigo</label>
+      <label class="chk"><input type="checkbox" name="alergia_lactosa" value="Sí"> Lactosa</label>
+      <label class="chk"><input type="checkbox" name="alergia_caseina" value="Sí"> Caseína (prot. leche)</label>
+      <label class="chk"><input type="checkbox" name="alergia_huevo" value="Sí"> Huevo</label>
+      <label class="chk"><input type="checkbox" name="alergia_frutos_secos" value="Sí"> Frutos secos</label>
+      <label class="chk"><input type="checkbox" name="alergia_cacahuete" value="Sí"> Cacahuete</label>
+      <label class="chk"><input type="checkbox" name="alergia_marisco" value="Sí"> Marisco / moluscos</label>
+      <label class="chk"><input type="checkbox" name="alergia_pescado" value="Sí"> Pescado</label>
+      <label class="chk"><input type="checkbox" name="alergia_soja" value="Sí"> Soja</label>
+      <label class="chk"><input type="checkbox" name="alergia_sesamo" value="Sí"> Sésamo</label>
+      <label class="chk"><input type="checkbox" name="alergia_sulfitos" value="Sí"> Sulfitos</label>
+      <label class="chk"><input type="checkbox" name="alergia_fructosa" value="Sí"> Fructosa</label>
+      <label class="chk"><input type="checkbox" name="alergia_histamina" value="Sí"> Histamina</label>
+      <label class="chk"><input type="checkbox" name="alergia_ninguna" value="Sí"> Ninguna conocida</label>
+    </div>
+    <div class="field" style="margin-top:8px">
+      <label>Otras reacciones o intolerancias no listadas</label>
+      <textarea name="otras_alergias" placeholder="Cualquier alimento que provoque reacción, malestar digestivo u otro síntoma..."></textarea>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── BLOQUE 08: PREFERENCIAS Y CONTEXTO ── -->
+  <div class="block" id="b8">
+    <div class="block-head">
+      <div class="block-num">08</div>
+      <div class="block-title">Preferencias y contexto práctico</div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Patrón alimentario</label>
+        <div class="sw"><select name="patron_alimentario">
+          <option value="">— Seleccionar —</option>
+          <option>Omnívoro</option>
+          <option>Flexitariano</option>
+          <option>Vegetariano</option>
+          <option>Vegano</option>
+          <option>Carnívoro / Animal-based</option>
+          <option>Sin preferencia definida</option>
+        </select></div>
+      </div>
+      <div class="field">
+        <label>¿Cocinas en casa habitualmente?</label>
+        <div class="pills">
+          <label class="pill"><input type="radio" name="cocina_casa" value="Sí"> Sí</label>
+          <label class="pill"><input type="radio" name="cocina_casa" value="No"> No</label>
+          <label class="pill"><input type="radio" name="cocina_casa" value="A veces"> A veces</label>
+        </div>
+      </div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Alimentos que NO consumes por preferencia</label>
+        <textarea name="alimentos_excluidos" placeholder="Ej: no como hígado, no me gustan los mariscos..."></textarea>
+      </div>
+      <div class="field">
+        <label>Alimentos frecuentes que quieres mantener</label>
+        <textarea name="alimentos_frecuentes" placeholder="Ej: huevos a diario, yogur griego, aguacate..."></textarea>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Tiempo disponible para cocinar</label>
+        <div class="sw"><select name="tiempo_cocina">
+          <option value="">— Seleccionar —</option>
+          <option>Menos de 15 min por ingesta</option>
+          <option>15–30 min</option>
+          <option>30–60 min</option>
+          <option>Sin restricción</option>
+        </select></div>
+      </div>
+      <div class="field">
+        <label>Presupuesto semanal en alimentación</label>
+        <div class="sw"><select name="presupuesto_semanal">
+          <option value="">— Seleccionar —</option>
+          <option>Menos de 40 € / semana</option>
+          <option>40–70 € / semana</option>
+          <option>70–100 € / semana</option>
+          <option>Sin restricción</option>
+        </select></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── BLOQUE 09: SUPLEMENTACIÓN Y HÁBITOS ── -->
+  <div class="block" id="b9">
+    <div class="block-head">
+      <div class="block-num">09</div>
+      <div class="block-title">Suplementación y hábitos</div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Suplementación actual</label>
+        <textarea name="suplementacion" placeholder="Creatina, proteína, vitamina D, omega-3, magnesio... indica dosis. 'Ninguna' si no tomas."></textarea>
+      </div>
+      <div class="field">
+        <label>Consumo de alcohol</label>
+        <div class="sw"><select name="consumo_alcohol">
+          <option value="">— Seleccionar —</option>
+          <option>No consumo</option>
+          <option>Ocasional (1–2 veces al mes)</option>
+          <option>Moderado (1–2 veces por semana)</option>
+          <option>Frecuente (+3 veces por semana)</option>
+        </select></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Café / estimulantes</label>
+        <input type="text" name="consumo_cafe" placeholder="Ej: 2 cafés al día, té verde, sin cafeína...">
+      </div>
+      <div class="field">
+        <label>Hidratación diaria estimada</label>
+        <div class="sw"><select name="hidratacion">
+          <option value="">— Seleccionar —</option>
+          <option>Menos de 1 litro</option>
+          <option>1–1.5 litros</option>
+          <option>1.5–2.5 litros</option>
+          <option>Más de 2.5 litros</option>
+        </select></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SEPARADOR OBJETIVO GLOBAL ════ -->
+  <div class="sec-div">
+    <div class="sec-div-line"></div>
+    <div class="sec-div-label">Objetivo global</div>
+    <div class="sec-div-line"></div>
+  </div>
+
+  <!-- ── BLOQUE 10: OBJETIVO Y MOTIVACIÓN ── -->
+  <div class="block" id="b10">
+    <div class="block-head">
+      <div class="block-num">10</div>
+      <div class="block-title">Objetivo global y motivación</div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Objetivo principal de la asesoría <span class="req">*</span></label>
+        <div class="sw"><select name="objetivo_principal" required>
+          <option value="">— Seleccionar —</option>
+          <option>Pérdida de grasa</option>
+          <option>Ganancia muscular</option>
+          <option>Recomposición corporal</option>
+          <option>Rendimiento deportivo</option>
+          <option>Salud metabólica general</option>
+          <option>Control de patología</option>
+          <option>Otro</option>
+        </select></div>
+      </div>
+      <div class="field">
+        <label>Plazo estimado para el objetivo</label>
+        <div class="sw"><select name="plazo_objetivo">
+          <option value="">— Seleccionar —</option>
+          <option>1–3 meses</option>
+          <option>3–6 meses</option>
+          <option>6–12 meses</option>
+          <option>Sin plazo definido / largo plazo</option>
+        </select></div>
+      </div>
+    </div>
+    <div class="g2 mb">
+      <div class="field">
+        <label>Historial de intentos anteriores</label>
+        <textarea name="historial_intentos" placeholder="¿Qué has probado antes? ¿Qué funcionó y qué no? ¿Por qué lo dejaste?"></textarea>
+      </div>
+      <div class="field">
+        <label>Mayor dificultad para mantener un plan</label>
+        <textarea name="dificultad_adherencia" placeholder="Falta de tiempo, cenas sociales, desmotivación, trabajo por turnos, adherencia..."></textarea>
+      </div>
+    </div>
+    <div class="field">
+      <label>Información adicional relevante</label>
+      <textarea name="info_adicional" style="min-height:72px" placeholder="Cualquier dato que no haya aparecido y quieras que tenga en cuenta para diseñar tu plan integral."></textarea>
+    </div>
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="submit-area">
+    <div class="submit-note">10 bloques completados · Asesoría integral RealShift</div>
+    <button type="submit" class="btn-submit" id="btnSubmit">Enviar formulario →</button>
+    <div class="privacy-note">Datos de uso exclusivo del asesor RealShift · Uso confidencial · No se comparten con terceros</div>
+  </div>
+
+</form>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const BLOCKS = 10;
+  const labels = [
+    'Datos personales','Antropometría','Estado de salud',
+    'Historial de entrenamiento','Rendimiento y objetivos',
+    'Hábitos nutricionales','Alergias e intolerancias',
+    'Preferencias y contexto','Suplementación y hábitos','Objetivo global'
+  ];
+
+  function buildProgress() {
+    const wrap = document.getElementById('progressSteps');
+    for (let i = 0; i < BLOCKS; i++) {
+      const d = document.createElement('div');
+      d.className = 'prog-step';
+      d.id = 'ps' + i;
+      wrap.appendChild(d);
+    }
+  }
+
+  function updateProgress() {
+    const blocks = document.querySelectorAll('.block');
+    let active = 0;
+    blocks.forEach((b, i) => {
+      if (b.getBoundingClientRect().top < window.innerHeight * 0.55) active = i;
+    });
+    for (let i = 0; i < BLOCKS; i++) {
+      const el = document.getElementById('ps' + i);
+      if (!el) continue;
+      el.className = i < active ? 'prog-step done' : i === active ? 'prog-step active' : 'prog-step';
+    }
+    const lbl = document.getElementById('progressLabel');
+    if (lbl) lbl.textContent = `Bloque ${active + 1} de ${BLOCKS} — ${labels[active]}`;
+  }
+
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + type;
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 4500);
+  }
+
+  document.getElementById('rsForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    try {
+      const res = await fetch('https://formspree.io/f/mwvzpavk', {
+        method: 'POST',
+        body: new FormData(this),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        showToast('✓ Formulario enviado correctamente', 'ok');
+        btn.textContent = '✓ Enviado';
+        btn.style.background = 'var(--green)';
+        btn.style.color = '#000';
+      } else {
+        throw new Error();
+      }
+    } catch {
+      showToast('✗ Error al enviar. Inténtalo de nuevo.', 'err');
+      btn.disabled = false;
+      btn.textContent = 'Enviar formulario →';
+    }
+  });
+
+  buildProgress();
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+</script>
+</body>
+</html>
